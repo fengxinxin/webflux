@@ -1,5 +1,6 @@
 package com.iolo.webflux.handler;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -20,11 +21,17 @@ import static org.springframework.web.reactive.function.server.ServerResponse.ok
  * @date 2019-03-14
  */
 @Component
+@Slf4j
 public class TimeHandler {
     public Mono<ServerResponse> sendTimePerSec(ServerRequest serverRequest) {
         return ok().contentType(MediaType.TEXT_EVENT_STREAM).body(
-                Flux.interval(Duration.ofMinutes(1))
-                        .map(l -> new SimpleDateFormat("YYYY-MM-DD hh:mm:ss").format(new Date())),
+                Flux.interval(Duration.ofSeconds(5))
+                        .map(l -> {
+                            log.info(String.valueOf(l));
+                            log.info(serverRequest.queryParam("id").orElse("other"));
+                            String dateStr = new SimpleDateFormat("YYYY-MM-DD hh:mm:ss").format(new Date());
+                            return serverRequest.queryParam("id").orElse("other") + dateStr;
+                        }),
                 String.class
         );
     }

@@ -1,5 +1,7 @@
 package com.iolo.webflux.controller;
 
+import com.iolo.webflux.domain.City;
+import com.iolo.webflux.handler.CityHandler;
 import com.iolo.webflux.handler.TimeHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ import java.time.Duration;
 public class TestController {
     @Autowired
     private TimeHandler timeHandler;
+    @Autowired
+    private CityHandler cityHandler;
 
     @GetMapping("hello")
     public Mono<String> hell() {
@@ -29,14 +33,17 @@ public class TestController {
     }
 
     @GetMapping(value = "times1", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> times1(String id) {
+    public Flux<City> times1(String id) {
         log.info(id);
         return Flux.interval(Duration.ofSeconds(5)).map(l -> {
-            boolean flag = false;
-            if (l / 2 == 0) {
-                flag = true;
-            }
-            return flag ? id + " " + l : "false";
+//            boolean flag = false;
+//            if (l / 2 == 0) {
+//                flag = true;
+//            }
+            Mono<City> city = cityHandler.findCityById(Long.valueOf(id));
+            City one = new City();
+            city.log();
+            return one;
         });
     }
 
